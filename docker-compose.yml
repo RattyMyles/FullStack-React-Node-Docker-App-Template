@@ -1,0 +1,60 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "Password123!"
+    networks:
+      - docker-service
+    volumes:
+      - maria-data:/data/db
+      - ./data/data.sql:/docker-entrypoint-initdb.d/data.sql
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - docker-service
+    ports:
+      - 1000:8080
+
+  node-api:
+    image: rattymyles/nodeapi
+    container_name: node-api
+    ports:
+      - "3001:3001"
+    networks:
+      - docker-service
+    environment:
+      DB_HOST: "mariadb"
+      DB_PORT: 3306
+      DB_USER: "app_user"
+      DB_PASSWORD: "Password123!"
+      DB_DATABASE: "games"
+    depends_on:
+      - mariadb
+  
+  
+  react-frontend:
+    image: rattymyles/reactnginx
+    container_name: react-nginx
+    networks:
+      - docker-service
+    ports:
+      - "8080:80"
+    environment:
+      REACT_APP_API_URL: "http://localhost:3001"
+      DB_HOST: "mariadb"
+    depends_on:
+      - node-api
+
+networks:
+  docker-service:
+    driver: bridge
+
+volumes:
+  maria-data:
+    driver: local
