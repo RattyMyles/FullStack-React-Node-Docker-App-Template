@@ -19,6 +19,7 @@ This project consists of a static React site that communicates with a Node.js AP
 
 ### Diagram
 
+![Diagram](reactnodejsmariadb.drawio.png)
 
 
 ### How to use it? 
